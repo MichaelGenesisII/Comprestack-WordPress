@@ -4,9 +4,9 @@ Tags: images, compression, webp, avif, optimize, performance, woocommerce
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.3
-License: MIT
-License URI: https://opensource.org/licenses/MIT
+Stable tag: 0.1.4
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Compress and convert Media Library and WooCommerce product images with the Comprestack API.
 
@@ -69,6 +69,9 @@ Plugin settings and Comprestack attachment meta are removed. Backup files under 
 4. Product edit — optimize product images
 
 == Changelog ==
+
+= 0.1.4 =
+* Canonical plugin headers (Description, Version, GPLv2 or later)
 
 = 0.1.3 =
 * Use WordPress HTTP API instead of cURL (Plugin Check)
