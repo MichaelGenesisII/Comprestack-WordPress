@@ -1,0 +1,14 @@
+.git
+.github
+.gitignore
+.wordpress-org
+node_modules
+*.zip
+.DS_Store
+Thumbs.db
+phpunit.xml
+composer.phar
+composer.lock
+vendor
+tests
+MIRROR.md

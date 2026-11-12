@@ -1,0 +1,55 @@
+.comprestack-settings .comprestack-lead {
+  max-width: 42rem;
+  color: #50575e;
+}
+
+.comprestack-settings .comprestack-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  margin: 0 0 1.25rem;
+}
+
+.comprestack-settings .comprestack-version {
+  color: #787c82;
+  font-size: 12px;
+}
+
+.comprestack-settings .comprestack-card {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  padding: 1rem 1.25rem 1.25rem;
+  margin: 0 0 1.25rem;
+  max-width: 52rem;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.comprestack-settings .comprestack-card h2 {
+  margin-top: 0;
+  padding: 0;
+  font-size: 1.1rem;
+}
+
+.comprestack-settings .comprestack-usage {
+  margin: 0 0 0.75rem;
+}
+
+.comprestack-settings .comprestack-status {
+  margin-left: 0.5rem;
+  color: #50575e;
+}
+
+.comprestack-settings .comprestack-status.is-ok {
+  color: #007017;
+}
+
+.comprestack-settings .comprestack-status.is-error {
+  color: #b32d2e;
+}
+
+#comprestack-optimize-status {
+  margin-left: 0.35rem;
+  color: #50575e;
+}
