@@ -172,10 +172,10 @@ final class Comprestack_Settings
                     'used' => $usage['images_used'] ?? null,
                 ],
             ]);
-        } catch (Comprestack\ComprestackException $e) {
+        } catch (Comprestack_Api_Exception $e) {
             wp_send_json([
                 'ok' => false,
-                'message' => Comprestack_Admin_Notices::message_for_code($e->errorCode, $e->getMessage()),
+                'message' => Comprestack_Admin_Notices::message_for_code($e->error_code, $e->getMessage()),
             ]);
         } catch (Throwable $e) {
             wp_send_json(['ok' => false, 'message' => $e->getMessage()]);

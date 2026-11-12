@@ -2,9 +2,9 @@
 Contributors: michaelgenesisii
 Tags: images, compression, webp, avif, optimize, performance, woocommerce
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -69,6 +69,11 @@ Plugin settings and Comprestack attachment meta are removed. Backup files under 
 4. Product edit — optimize product images
 
 == Changelog ==
+
+= 0.1.3 =
+* Use WordPress HTTP API instead of cURL (Plugin Check)
+* Use wp_delete_file / WP_Filesystem for file moves
+* Tested up to WordPress 7.1; remove hidden package files from zip
 
 = 0.1.2 =
 * WooCommerce product, gallery, and variation image hooks

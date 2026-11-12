@@ -2,23 +2,16 @@
 
 declare(strict_types=1);
 
-use Comprestack\Client;
-use Comprestack\ComprestackException;
-
 final class Comprestack_Optimizer
 {
-    public static function client(): ?Client
+    public static function client(): ?Comprestack_Api_Client
     {
         $api_key = Comprestack_Settings::api_key();
         if ($api_key === '') {
             return null;
         }
 
-        return new Client([
-            'apiKey' => $api_key,
-            'timeout' => 180,
-            'maxRetries' => 2,
-        ]);
+        return new Comprestack_Api_Client($api_key, 180, 2);
     }
 
     public static function is_image_mime(string $mime): bool
@@ -30,7 +23,7 @@ final class Comprestack_Optimizer
     /**
      * Optimize a file on disk in place (may change extension when converting).
      *
-     * @return array{ok: bool, path?: string, mime?: string, bytes_before?: int, bytes_after?: int, saved_percent?: float, error?: string, code?: string}
+     * @return array{ok: bool, path?: string, mime?: string, bytes_before?: int, bytes_after?: int, saved_percent?: float, backup_path?: string, error?: string, code?: string}
      */
     public static function optimize_file(string $path, ?string $mime = null): array
     {
@@ -71,11 +64,11 @@ final class Comprestack_Optimizer
                 $job = $client->convert([$path], $format, $options);
             }
             $bytes = $client->download($job);
-        } catch (ComprestackException $e) {
+        } catch (Comprestack_Api_Exception $e) {
             return [
                 'ok' => false,
                 'error' => $e->getMessage(),
-                'code' => $e->errorCode,
+                'code' => $e->error_code,
             ];
         } catch (Throwable $e) {
             return [
@@ -111,12 +104,11 @@ final class Comprestack_Optimizer
         }
 
         if ($new_path !== $path && file_exists($path)) {
-            // Replace original when extension changes.
-            unlink($path);
+            wp_delete_file($path);
         }
 
-        if (!rename($tmp, $new_path)) {
-            @unlink($tmp);
+        if (!self::move_file($tmp, $new_path)) {
+            wp_delete_file($tmp);
             return ['ok' => false, 'error' => 'Unable to replace file', 'code' => 'write_failed'];
         }
 
@@ -139,8 +131,6 @@ final class Comprestack_Optimizer
     }
 
     /**
-     * Optimize a WordPress attachment (original + regenerate metadata/sizes).
-     *
      * @return array{ok: bool, error?: string, code?: string, saved_percent?: float, skipped?: bool}
      */
     public static function optimize_attachment(int $attachment_id, bool $force = false): array
@@ -185,7 +175,6 @@ final class Comprestack_Optimizer
                 }
             }
 
-            // Regenerate sizes from the optimized original (skipped by media hook via flag).
             $meta = wp_generate_attachment_metadata($attachment_id, $new_path);
             if (is_array($meta)) {
                 wp_update_attachment_metadata($attachment_id, $meta);
@@ -211,6 +200,27 @@ final class Comprestack_Optimizer
         }
     }
 
+    private static function move_file(string $from, string $to): bool
+    {
+        global $wp_filesystem;
+        if (!function_exists('WP_Filesystem')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+        if (!$wp_filesystem instanceof WP_Filesystem_Base) {
+            WP_Filesystem();
+        }
+        if ($wp_filesystem instanceof WP_Filesystem_Base) {
+            return (bool) $wp_filesystem->move($from, $to, true);
+        }
+
+        // Fallback if filesystem API is unavailable.
+        if (!@copy($from, $to)) {
+            return false;
+        }
+        wp_delete_file($from);
+        return true;
+    }
+
     /** @return string|null Absolute backup path on success */
     private static function backup_original(string $path): ?string
     {
@@ -224,11 +234,6 @@ final class Comprestack_Optimizer
             return null;
         }
 
-        // Discourage public listing.
-        $htaccess = $dir . '/.htaccess';
-        if (!file_exists($htaccess)) {
-            file_put_contents($htaccess, "Options -Indexes\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n");
-        }
         $index = $dir . '/index.php';
         if (!file_exists($index)) {
             file_put_contents($index, "<?php\n// Silence is golden.\n");
